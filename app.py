@@ -228,10 +228,8 @@ def parse_filter_context(preview_df):
     for value in preview_df.head(10).values.flatten().tolist():
         if pd.notna(value):
             text_chunks.append(str(value))
-    full_text = "
-".join(text_chunks)
-    lower_text = full_text.lower()
-
+full_text = "\n".join(text_chunks)
+lower_text = full_text.lower()
     if "resource is electricity" in lower_text or "electricity" in lower_text:
         context["commodity"] = "electricity"
     elif "resource is natural gas" in lower_text or "natural gas" in lower_text:
