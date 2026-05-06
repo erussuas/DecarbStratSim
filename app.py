@@ -211,7 +211,6 @@ def read_excel_smart(uploaded_file):
     uploaded_file.seek(0)
     return df, best_header_row, preview
 
-
 def parse_filter_context(preview_df):
     """
     Extracts useful context from BI-export filter text when data columns are missing.
@@ -228,13 +227,17 @@ def parse_filter_context(preview_df):
     for value in preview_df.head(10).values.flatten().tolist():
         if pd.notna(value):
             text_chunks.append(str(value))
-full_text = "\n".join(text_chunks)
-lower_text = full_text.lower()
+
+    full_text = "\n".join(text_chunks)
+    lower_text = full_text.lower()
+
+    # Detect commodity
     if "resource is electricity" in lower_text or "electricity" in lower_text:
         context["commodity"] = "electricity"
     elif "resource is natural gas" in lower_text or "natural gas" in lower_text:
         context["commodity"] = "natural_gas"
 
+    # Detect unit
     if "quantity uom for emissions is mwh" in lower_text or " mwh" in lower_text:
         context["unit"] = "MWh"
     elif "quantity uom for emissions is mmbtu" in lower_text or "mmbtu" in lower_text:
@@ -242,16 +245,15 @@ lower_text = full_text.lower()
     elif "therm" in lower_text:
         context["unit"] = "therms"
 
+    # Extract metadata
     for line in full_text.splitlines():
         line_lower = line.lower().strip()
         if line_lower.startswith("country name is"):
             context["country"] = line.split(" is ", 1)[-1].strip()
         if line_lower.startswith("customer name is"):
             context["customer_name"] = line.split(" is ", 1)[-1].strip()
-
     return context
-
-
+    
 def normalize_state(value):
     if pd.isna(value):
         return "Unknown"
